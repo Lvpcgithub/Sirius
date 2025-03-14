@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package probe;
+
+// 指定 Go 生成代码的包路径
+option go_package = ".;protocol";
+
+// 控制面向数据面发多个探测任务
+service ProbeTaskService {
+  // 发起探测任务，返回任务执行的状态
+  rpc SendProbeTasks (ProbeTaskRequest) returns (ProbeTaskResponse);
+}
+
+// 数据面向控制面上报多个探测结果
+service ProbeResultService {
+  // 上报多个探测结果
+  rpc SendProbeResults (ProbeResultRequest) returns (ProbeResultResponse);
+}
+
+// 定义 ProbeTaskRequest，包含多个探测任务
+message ProbeTaskRequest {
+  repeated ProbeTask tasks = 1; // 多个探测任务
+}
+
+// 定义单个探测任务
+message ProbeTask {
+  string ip1 = 1;  // 源 IP 地址
+  string ip2 = 2;  // 目标 IP 地址
+}
+
+// 控制面返回任务执行结果的响应
+message ProbeTaskResponse {
+  string status = 1; // 返回状态信息，例如 "ok"
+}
+
+// 定义 ProbeResultRequest，包含多个探测结果
+message ProbeResultRequest {
+  repeated ProbeResult results = 1; // 多个探测结果
+}
+
+// 定义 ProbeResult，包含探测结果
+message ProbeResult {
+  string ip1 = 1;       // 源 IP 地址
+  string ip2 = 2;       // 目标 IP 地址
+  int64 tcp_delay = 3;  // TCP 延迟
+  string timestamp = 4; // 时间戳，格式为 RFC3339
+}
+
+// 数据面向控制面返回探测结果的响应
+message ProbeResultResponse {
+  string status = 1; // 返回状态信息，例如 "ok"
+}
